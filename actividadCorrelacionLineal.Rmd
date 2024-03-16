@@ -1,0 +1,170 @@
+---
+title: "actividadCorrelacionLineal"
+author: "Carmen García Fernández"
+date: "2024-03-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Pregunta 1. 
+Correlación hace referencia a cualquier tipo de relación entre variables. Estadísticamente se refiere a la relación cuantitativa entre dos variables medidas en escalas de intervalo. Este coeficiente de correlación se encarga de medir la fuerza y dirección de la relación lineal entre dos variables. Un ejemplo de esto sería el método de coeficiente de correlación lineal de Pearson, que es el coeficiente que mide una tendencia lineal entre dos variables que deben ser numéricas. La correlación de Pearson es la más recomendada para las variables cuantitativas continuadas.
+
+##Pregunta 2
+Porque los coeficientes de correlación se pueden calcular por distintos métodos, paramétricos y no paramétricos. Un caso de correlación lineal sería el Coeficiente de Correlación de Pearson porque es usado para observaciones obtenidas sobre una serie de intervalos y bajo unas condiciones más restrictivas que las paramétricas. Un ejemplo de correlación lineal no paramétrica sería el Coeficiente de Correlación por Rangos de Spearman
+
+##Pregunta 3
+```{r echo=TRUE}
+library(readxl)
+data <- read_excel("C:/actividadCorrelacionLineal/data.xls")
+View(data)
+```
+
+```{r echo=TRUE}
+library(readxl)
+data <- as.data.frame(read_excel("C:/actividadCorrelacionLineal/data.xls"))
+data
+```
+
+```{r echo=TRUE}
+correlación <- cor(data)
+``` 
+
+```{r}
+panel.cor <- function (x, y, digits = 2, prefix = "", cex.cor, ...) {
+  usr <- par("usr")
+  on.exit (par(usr))
+  par(usr = c(0, 1, 0, 1))
+  Cor <- abs(cor(x, y))
+  txt <- paste0(prefix, format(c(Cor, 0.123456789), digits = digits) [1])
+                if(missing(cex.cor)){
+                  cex.cor <-0.4 / strwidth(txt)
+                }
+                text(0.5, 0.5, txt,
+                     cex = 1 + cex.cor * Cor)
+}
+
+pairs(data,
+      upper.panel = panel.cor,
+      lower.panel = panel.smooth)
+```
+
+
+##Pregunta 4
+```{r echo=TRUE}
+cor.test(data$peso, data$altura)
+```
+
+##Pregunta 5
+
+```{r warning=FALSE}
+library(correlation)
+resultados <- correlation(data)
+resultados
+```
+
+##Pregunta 6
+
+```{r echo=TRUE}
+library(ggpubr)
+ggscatter(data, x = "altura", y = "peso",
+          add = "reg.line", conf.int = TRUE,
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Altura piezas (mm)", ylab = "Peso piezas (mg)")
+```
+
+##Pregunta 7
+```{r}
+library(corrplot)
+corrplot(cor(data))
+```
+
+```{r}
+corrplot.mixed(cor(data))
+```
+
+##Pregunta 8
+#8a Crea dos vectores llamados distancia y n_piezas para almacenarlos en un data frame
+```{r}
+distancia <- c(1.1, 100.2, 90.3,5.4,57.5,6.6,34.7,65.8,57.9,86.1)
+n_piezas <- c(110, 2, 6, 98, 40, 94, 31, 5, 8, 10)
+dist_ncuent <- data.frame(distancia, n_piezas)
+knitr::kable(dist_ncuent)
+```
+
+#8b Calcula el coeficiente de correlación
+```{r echo=FALSE}
+library(correlation)
+resultado <- correlation(dist_ncuent)
+resultado
+```
+El coeficiente de correlación (0,92) nos indica que existe una relación lineal inversa quasiperfecta ya que se encuentra próximo a -1. Los valores del intervalo de confianza del 95% muestran el invervalo de valores para el coeficiente de correlación. Atendiendo a los resultados podemos determinar que la correlación es significativa ya que el p-value es menor al intervalo de confianza
+
+
+#8c Calcula el nivel de significancia
+```{r echo=TRUE}
+cor.test(dist_ncuent$distancia, dist_ncuent$n_piezas)
+```
+
+#8d Calcula el Intervalo de confianza al 95% en relación con el coeficiente de correlación
+Se responde con el resultado de la pregunta 8e, donde se observa que el p-value da un resultado de 0.0001265, por lo que el margen de error es prácticamente inexistente. El resultado del 95% de intervalo de confianza es de -0.9824414 
+
+#8e ¿Qué intensidad y dirección presentan ambas variables?
+```{r echo=TRUE}
+library(ggpubr)
+ggscatter(dist_ncuent, x = "distancia", y = "n_piezas",
+          add = "reg.line", conf.int = TRUE,
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Distancia", ylab = "N_piezas")
+```
+
+#8f ¿Es significativa esta relación?
+Es significativa dado el p-value tan reducido al porcentaje de confianza
+
+#8g Resulta apropiado afirmar la correlación (o no) entre variables con un tamaño muestral tan reducido (n=10)
+Podría decirse que sí a partir de los datos y resultados que tenemos, aunque el número de muestras para la distancia que tenemos es reducido y sería ideal tener un número de muestras mucho mayor para unos resultados más objetivos
+
+##Pregunta 9
+```{r echo=TRUE}
+r_lineal1 <- c(1.2, 2.4, 4.7, 5.8, 7.3, 9.6, 23.9, 42.2, 63.7, 99.1)
+r_lineal2 <- c(3, 7, 9, 14, 18, 23, 25, 29, 30, 34)
+relacion_lineal <- data.frame(r_lineal1, r_lineal2)
+knitr::kable(relacion_lineal)
+```
+
+```{r}
+r_monotona1 <- c(1.2, 2.4, 4.7, 5.8, 7.3, 9.6, 23.9, 42.2, 63.7, 99.1)
+r_monotona2 <- c(3, 7, 9, 14, 18, 23, 25, 29, 30, 34)
+relacion_monotona <- data.frame(r_monotona1, r_monotona2)
+knitr::kable(relacion_monotona)
+```
+
+```{r}
+plot(r_lineal1, r_lineal2, main = "Relación Lineal",
+     xlab = "RL1", ylab = "RL2", col = "red")
+abline(lm(r_lineal1 ~ r_lineal2), col = "blue")
+```
+
+```{r}
+plot(r_monotona1, r_monotona2, main = "Relación Monótona",
+     xlab = "RM1", ylab = "RM2", col = "red")
+```
+
+##Pregunta 10
+Para las variables que experimentan una relación monótona, normalmente se usa el método de correlación de Spearman, la cual no asume con tanto detalle los datos a diferencia del método de Pearson.
+
+```{r}
+espacio <- c(1.3, 2.5, 4.8, 5.9, 7.4, 9.7, 23.8, 42.3)
+tamaño <- c(4, 8, 10, 15, 19, 24, 26, 30)
+datoEjemplo <- data.frame(espacio, tamaño)
+```
+
+```{r}
+cor_spearman <- cor(datoEjemplo$espacio, datoEjemplo$tamaño, method = "spearman")
+```
+
+```{r}
+print(paste("Correlación de Spearman:", cor_spearman))
+```
